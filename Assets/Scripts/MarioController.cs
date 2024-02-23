@@ -64,6 +64,7 @@ public class MarioController : MonoBehaviour
         if (collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
             animator.SetTrigger("Death");
+
         }
     }
 
