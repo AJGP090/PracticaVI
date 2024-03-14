@@ -10,7 +10,7 @@ public class MarioController : MonoBehaviour
     private Animator animator;
     public bool isGrounded;
     [SerializeField] private float empuje = 2f;
-    public GameObject marioPeque, MarioGrande;
+    public bool _isMarioBig;
 
     private void Start()
     {
@@ -23,11 +23,9 @@ public class MarioController : MonoBehaviour
     {
         // Cogemos el input
         float movX = Input.GetAxis("Horizontal");
-        //float movY = Input.GetAxis("Vertical");
 
         // Aplicamos la velocidad
         Vector2 velocidadFinal = new Vector2(movX * velocidad, rbody.velocity.y);
-        //rb.velocity.x = 
         rbody.velocity = velocidadFinal;
 
         // Si nos movemos hacia la izquierda, espejo el sprite.
@@ -42,11 +40,11 @@ public class MarioController : MonoBehaviour
         }
 
         // TODO: ESTABLECER LAS ANIMACIONES
-        //animator.SetFloat("MovY", velocidadFinal.y);
         animator.SetBool("MovX", velocidadFinal.x != 0f);
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            isGrounded = false;
             animator.SetTrigger("Jumping");
             rbody.AddForce(transform.up * empuje);
         }
@@ -63,7 +61,17 @@ public class MarioController : MonoBehaviour
 
         if (collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
-            animator.SetTrigger("Death");
+            if (_isMarioBig)
+            {
+                animator.SetLayerWeight(0, 1f);
+                animator.SetLayerWeight(1, 0f);
+                Destroy(collision.gameObject);
+
+            }
+            else
+            {
+                animator.SetTrigger("Death");
+            }
 
         }
     }
@@ -72,8 +80,12 @@ public class MarioController : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("PowerUp"))
         {
-            marioPeque.gameObject.SetActive(false);
-            MarioGrande.gameObject.SetActive(true);
+            animator.SetLayerWeight(0, 0f);
+            animator.SetLayerWeight(1, 1f);
+            Destroy(collision.gameObject);
+            _isMarioBig = true;
+            /*marioPeque.gameObject.SetActive(false);
+            MarioGrande.gameObject.SetActive(true);*/
         }
     }
 }
